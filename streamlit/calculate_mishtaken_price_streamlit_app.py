@@ -120,36 +120,7 @@ def calculate_apartment_price(
         "calculation_details": calculation_details
     }
 
-def create_price_comparison_chart(result):
-    """Create a price comparison chart using Streamlit's built-in charts."""
-    details = result['calculation_details']['price_calculations']
-    
-    chart_data = pd.DataFrame({
-        'Price Type': ['Current Price', 'Main Price', 'Final Price'],
-        'Amount (₪)': [
-            details['current_total_price'],
-            details['main_total_price'],
-            result['final_price_including_vat']
-        ]
-    })
-    
-    return chart_data
 
-def create_area_breakdown_chart(result):
-    """Create an area breakdown chart using Streamlit's built-in charts."""
-    area_details = result['calculation_details']['area_breakdown']
-    
-    chart_data = pd.DataFrame({
-        'Component': ['Apartment', 'Balcony', 'Storage', 'Parking'],
-        'Effective Area (m²)': [
-            area_details['apartment'],
-            area_details['balcony'],
-            area_details['storage'],
-            area_details['parking']
-        ]
-    })
-    
-    return chart_data
 
 def main():
     """Main Streamlit application."""
@@ -272,28 +243,50 @@ def main():
                 f"{discount_percent:.1f}%"
             )
         
-        # Charts
-        col1, col2 = st.columns(2)
+        # Price Comparison Section
+        st.subheader("💰 Price Comparison")
+        col1, col2, col3 = st.columns(3)
+        
+        details = result['calculation_details']['price_calculations']
         
         with col1:
-            st.subheader("💰 Price Comparison")
-            price_chart_data = create_price_comparison_chart(result)
-            st.bar_chart(price_chart_data.set_index('Price Type'), height=400)
-            
-            # Show price values
-            for _, row in price_chart_data.iterrows():
-                st.write(f"**{row['Price Type']}:** ₪{row['Amount (₪)']:,.0f}")
-        
+            st.info(f"**Current Price**\n₪{details['current_total_price']:,.0f}")
         with col2:
-            st.subheader("📐 Area Breakdown")
-            area_chart_data = create_area_breakdown_chart(result)
-            
-            # Use a pie chart alternative with bar chart
-            st.bar_chart(area_chart_data.set_index('Component'), height=400)
-            
-            # Show area values
-            for _, row in area_chart_data.iterrows():
-                st.write(f"**{row['Component']}:** {row['Effective Area (m²)']:.1f} m²")
+            st.warning(f"**Main Price**\n₪{details['main_total_price']:,.0f}")
+        with col3:
+            st.success(f"**Final Price**\n₪{result['final_price_including_vat']:,.0f}")
+        
+        # Create simple bar chart data
+        price_data = pd.DataFrame({
+            'Current Price': [details['current_total_price']],
+            'Main Price': [details['main_total_price']],
+            'Final Price': [result['final_price_including_vat']]
+        })
+        st.bar_chart(price_data)
+        
+        # Area Breakdown Section
+        st.subheader("📐 Area Breakdown")
+        
+        area_details = result['calculation_details']['area_breakdown']
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("🏠 Apartment", f"{area_details['apartment']:.1f} m²")
+        with col2:
+            st.metric("🌿 Balcony", f"{area_details['balcony']:.1f} m²")
+        with col3:
+            st.metric("📦 Storage", f"{area_details['storage']:.1f} m²")
+        with col4:
+            st.metric("🚗 Parking", f"{area_details['parking']:.1f} m²")
+        
+        # Create area chart
+        area_data = pd.DataFrame({
+            'Apartment': [area_details['apartment']],
+            'Balcony': [area_details['balcony']],
+            'Storage': [area_details['storage']],
+            'Parking': [area_details['parking']]
+        })
+        st.bar_chart(area_data)
         
         # Detailed breakdown
         with st.expander("📋 Detailed Calculation Breakdown", expanded=False):
