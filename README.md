@@ -14,3 +14,7 @@ For example:
 מחיר עדכני:
 
 <img width="1455" height="310" alt="image" src="https://github.com/user-attachments/assets/d6150258-dfe2-4a5f-b1a0-e927cd05e715" />
+
+Results should look like this, with the actual expected final price to pay being 3,116,864 NIS in this example:
+
+<img width="1915" height="778" alt="image" src="https://github.com/user-attachments/assets/560d7ded-c656-496c-8694-5d5cb130484a" />
