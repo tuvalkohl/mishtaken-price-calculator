@@ -10,8 +10,6 @@ To run:
 
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 def calculate_apartment_price(
     main_price_per_meter,
@@ -123,69 +121,35 @@ def calculate_apartment_price(
     }
 
 def create_price_comparison_chart(result):
-    """Create a price comparison chart using Plotly."""
+    """Create a price comparison chart using Streamlit's built-in charts."""
     details = result['calculation_details']['price_calculations']
     
-    prices = [
-        details['current_total_price'],
-        details['main_total_price'],
-        result['final_price_including_vat']
-    ]
+    chart_data = pd.DataFrame({
+        'Price Type': ['Current Price', 'Main Price', 'Final Price'],
+        'Amount (₪)': [
+            details['current_total_price'],
+            details['main_total_price'],
+            result['final_price_including_vat']
+        ]
+    })
     
-    labels = [
-        'Current Price',
-        'Main Price',
-        'Final Price'
-    ]
-    
-    colors = ['#ff6b6b', '#4ecdc4', '#45b7d1']
-    
-    fig = go.Figure(data=[
-        go.Bar(
-            x=labels,
-            y=prices,
-            marker_color=colors,
-            text=[f"₪{price:,.0f}" for price in prices],
-            textposition='auto',
-        )
-    ])
-    
-    fig.update_layout(
-        title="Price Comparison",
-        yaxis_title="Price (₪)",
-        showlegend=False,
-        height=400
-    )
-    
-    return fig
+    return chart_data
 
 def create_area_breakdown_chart(result):
-    """Create an area breakdown pie chart using Plotly."""
+    """Create an area breakdown chart using Streamlit's built-in charts."""
     area_details = result['calculation_details']['area_breakdown']
     
-    values = [
-        area_details['apartment'],
-        area_details['balcony'],
-        area_details['storage'],
-        area_details['parking']
-    ]
+    chart_data = pd.DataFrame({
+        'Component': ['Apartment', 'Balcony', 'Storage', 'Parking'],
+        'Effective Area (m²)': [
+            area_details['apartment'],
+            area_details['balcony'],
+            area_details['storage'],
+            area_details['parking']
+        ]
+    })
     
-    labels = ['Apartment', 'Balcony', 'Storage', 'Parking']
-    colors = ['#ff9999', '#66b3ff', '#99ff99', '#ffcc99']
-    
-    fig = go.Figure(data=[go.Pie(
-        labels=labels,
-        values=values,
-        hole=.3,
-        marker_colors=colors
-    )])
-    
-    fig.update_layout(
-        title="Effective Area Breakdown",
-        height=400
-    )
-    
-    return fig
+    return chart_data
 
 def main():
     """Main Streamlit application."""
@@ -312,10 +276,24 @@ def main():
         col1, col2 = st.columns(2)
         
         with col1:
-            st.plotly_chart(create_price_comparison_chart(result), use_container_width=True)
+            st.subheader("💰 Price Comparison")
+            price_chart_data = create_price_comparison_chart(result)
+            st.bar_chart(price_chart_data.set_index('Price Type'), height=400)
+            
+            # Show price values
+            for _, row in price_chart_data.iterrows():
+                st.write(f"**{row['Price Type']}:** ₪{row['Amount (₪)']:,.0f}")
         
         with col2:
-            st.plotly_chart(create_area_breakdown_chart(result), use_container_width=True)
+            st.subheader("📐 Area Breakdown")
+            area_chart_data = create_area_breakdown_chart(result)
+            
+            # Use a pie chart alternative with bar chart
+            st.bar_chart(area_chart_data.set_index('Component'), height=400)
+            
+            # Show area values
+            for _, row in area_chart_data.iterrows():
+                st.write(f"**{row['Component']}:** {row['Effective Area (m²)']:.1f} m²")
         
         # Detailed breakdown
         with st.expander("📋 Detailed Calculation Breakdown", expanded=False):
