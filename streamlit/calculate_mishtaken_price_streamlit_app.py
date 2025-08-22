@@ -130,8 +130,8 @@ def main():
         layout="wide"
     )
     
-    st.title("🏠 Apartment Price Calculator")
-    st.markdown("Calculate apartment prices with Israeli real estate discount system")
+    st.title("🏠 Mehir Lamishtaken (החנחב הריד) Price Calculator")
+    st.markdown("Calculate apartment price according to 'Dira Behanaha' weird discount system")
     
     # Sidebar for inputs
     st.sidebar.header("📊 Input Parameters")
@@ -256,12 +256,12 @@ def main():
         with col3:
             st.success(f"**Final Price**\n₪{result['final_price_including_vat']:,.0f}")
         
-        # Create simple bar chart data
+        # Create simple bar chart data with separate rows
         price_data = pd.DataFrame({
-            'Current Price': [details['current_total_price']],
-            'Main Price': [details['main_total_price']],
-            'Final Price': [result['final_price_including_vat']]
+            'Price Type': ['Current Price', 'Main Price', 'Final Price'],
+            'Amount': [details['current_total_price'], details['main_total_price'], result['final_price_including_vat']]
         })
+        price_data = price_data.set_index('Price Type')
         st.bar_chart(price_data)
         
         # Area Breakdown Section
@@ -279,13 +279,12 @@ def main():
         with col4:
             st.metric("🚗 Parking", f"{area_details['parking']:.1f} m²")
         
-        # Create area chart
+        # Create area chart with separate rows
         area_data = pd.DataFrame({
-            'Apartment': [area_details['apartment']],
-            'Balcony': [area_details['balcony']],
-            'Storage': [area_details['storage']],
-            'Parking': [area_details['parking']]
+            'Component': ['Apartment', 'Balcony', 'Storage', 'Parking'],
+            'Effective Area': [area_details['apartment'], area_details['balcony'], area_details['storage'], area_details['parking']]
         })
+        area_data = area_data.set_index('Component')
         st.bar_chart(area_data)
         
         # Detailed breakdown
