@@ -130,7 +130,7 @@ def main():
         layout="wide"
     )
     
-    st.title("🏠 Mehir Lamishtaken (החנחב הריד) Price Calculator")
+    st.title("🏠 Mehir Lamishtaken (דירה בהנחה) Price Calculator")
     st.markdown("Calculate apartment price according to 'Dira Behanaha' weird discount system")
     
     # Sidebar for inputs
